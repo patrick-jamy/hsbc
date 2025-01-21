@@ -30,7 +30,7 @@ public class TestThrottler {
         System.out.println("Attempt #5, we expect to be DO_NOT_PROCEED: it will be performed ~4s after the beginning, still full until 5s");
         System.out.println("Attempt #6, we expect to be PROCEED:  > 5s on timer, previous task are performed until 5s so it will be ok");
         
-        System.out.println("We also expect to see  5 notifications to Subscribers in the logs associated to the 5 performed tasks");
+        System.out.println("We also expect to see  notifications to each Subscribers associated to number of PROCEED in the logs when the Throtter is free after each call to shouldProceed");
         
         // Create a Throttler which authorized 3 calls every 5 sec
         ThrottlerImpl throttler = new ThrottlerImpl(3, 5000);
@@ -50,33 +50,12 @@ public class TestThrottler {
             }
         };
         
-        ThrottleSubscriber subscriber3 = new ThrottleSubscriber() {
-            @Override
-            public void onThrottleEvent(ThrottleResult result) {
-                System.out.println("Subscriber #3  notified, we can " + result);
-            }
-        };
-        
-        ThrottleSubscriber subscriber4 = new ThrottleSubscriber() {
-            @Override
-            public void onThrottleEvent(ThrottleResult result) {
-                System.out.println("Subscriber #4  notified, we can " + result);
-            }
-        };
-        
-        ThrottleSubscriber subscriber5 = new ThrottleSubscriber() {
-            @Override
-            public void onThrottleEvent(ThrottleResult result) {
-                System.out.println("Subscriber #5  notified, we can " + result);
-            }
-        };
+
 
         // Register the subscriber to be notified
         throttler.notifyWhenCanProceed(subscriber);
         throttler.notifyWhenCanProceed(subscriber2);
-        throttler.notifyWhenCanProceed(subscriber3);
-        throttler.notifyWhenCanProceed(subscriber4);
-        throttler.notifyWhenCanProceed(subscriber5);
+
 
         // Test calls in a loop
         for (int i = 0; i < 6; i++) {
