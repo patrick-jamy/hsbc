@@ -43,17 +43,7 @@ public class ThrottlerImpl implements Throttler {
 
 			// Notify
 			if (subscribers.size() > 0) {
-				int index = 0;
-				for (int notifiyCount = callTimes.size() ; notifiyCount <= maxCalls; notifiyCount ++)  {
-					if (index < subscribers.size()) {
-						subscribers.get(index).onThrottleEvent(ThrottleResult.PROCEED); // If yes we notify the subscriber
-						index++;
-					}
-				}
-
-				// Refresh the list
-				subscribers = subscribers.subList(index, subscribers.size());
-
+				subscribers.stream().forEach(s -> s.onThrottleEvent(ThrottleResult.PROCEED)); // If yes we notify the subscriber
 			}
 
 			return ThrottleResult.PROCEED;
