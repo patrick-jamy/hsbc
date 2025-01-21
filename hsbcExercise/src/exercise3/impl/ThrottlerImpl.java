@@ -31,7 +31,7 @@ public class ThrottlerImpl implements Throttler {
     @Override
     public ThrottleResult shouldProceed() {
         long currentTime = System.currentTimeMillis();
-
+        
         // Remove all the previous actions when time is over the timeWindow
         while (!callTimes.isEmpty() && currentTime - callTimes.peek() > timeWindow) {
             callTimes.poll();
@@ -44,13 +44,19 @@ public class ThrottlerImpl implements Throttler {
         	// Notify
         	if (subscribers.size() > 0) {
         		int index = 0;
-        		for (int notifiyCount = callTimes.size() ; notifiyCount < maxCalls; notifiyCount ++)  {
-        			notifyWhenCanProceed(subscribers.get(index));
-        			index++;
+        		for (int notifiyCount = callTimes.size() ; notifiyCount <= maxCalls; notifiyCount ++)  {
+        				if (index < subscribers.size()) {
+        	        	subscribers.get(index).onThrottleEvent(ThrottleResult.PROCEED); // If yes we notify the subscriber
+        				index++;
+        				}
         		}
+        		
 
         		// Refresh the list
-        		subscribers = subscribers.subList(index, subscribers.size());
+        		if (index >= 0) {
+        			subscribers = subscribers.subList(index, subscribers.size());
+        		}
+        		
         	}
 
         	return ThrottleResult.PROCEED;
@@ -63,13 +69,7 @@ public class ThrottlerImpl implements Throttler {
     // Notify the subscribers that the action can be performed (push)
     @Override
     public void notifyWhenCanProceed(ThrottleSubscriber subscriber) {
-    	// Check if the action can be performed
-        if (shouldProceed() == ThrottleResult.PROCEED) {
-            subscriber.onThrottleEvent(ThrottleResult.PROCEED); // If yes we notify the subscriber
-        } else {
-            // Else, we add the subscriber to the list
-            subscribers.add(subscriber);
-        }
+    	subscribers.add(subscriber);
     }
 
 }
