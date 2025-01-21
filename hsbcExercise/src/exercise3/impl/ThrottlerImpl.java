@@ -18,7 +18,7 @@ public class ThrottlerImpl implements Throttler {
     private final int maxCalls;      	    // Maxmimum number of authorized calls  
     private final long timeWindow;          // Time windo in miliseconds
     private final Queue<Long> callTimes;    // Register the time when the actions were performed
-    private final List<ThrottleSubscriber> subscribers; // Subscribers list
+    private  List<ThrottleSubscriber> subscribers; // Subscribers list
 
     public ThrottlerImpl(int maxCalls, long timeWindow) {
         this.maxCalls = maxCalls;
@@ -39,8 +39,24 @@ public class ThrottlerImpl implements Throttler {
 
         // If the number of calls is lesser than the maxCalls, we can proceed
         if (callTimes.size() < maxCalls) {
-            callTimes.offer(currentTime); // We record the actual time
-            return ThrottleResult.PROCEED;
+        	callTimes.offer(currentTime); // We record the actual time
+
+        	// Notify
+        	if (subscribers.size() > 0) {
+        		int index = 0;
+        		for (int notifiyCount = callTimes.size() ; notifiyCount < maxCalls; notifiyCount ++)  {
+        			notifyWhenCanProceed(subscribers.get(index));
+        			index++;
+        		}
+
+
+        		// Refresh the list
+        		List<ThrottleSubscriber> subscribersNew = new ArrayList<ThrottleSubscriber>();
+        		subscribersNew.addAll(callTimes.size(), subscribers);
+        		subscribers = subscribersNew;
+        	}
+
+        	return ThrottleResult.PROCEED;
         }
 
         // If the number of authorized calls is greater than the maxCalls, we can't proceed 
