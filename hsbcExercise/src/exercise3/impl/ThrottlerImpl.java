@@ -44,16 +44,13 @@ public class ThrottlerImpl implements Throttler {
         	// Notify
         	if (subscribers.size() > 0) {
         		int index = 0;
-        		for (int notifiyCount = maxCalls - callTimes.size() ; notifiyCount < maxCalls; notifiyCount ++)  {
+        		for (int notifiyCount = callTimes.size() ; notifiyCount < maxCalls; notifiyCount ++)  {
         			notifyWhenCanProceed(subscribers.get(index));
         			index++;
         		}
 
-
         		// Refresh the list
-        		List<ThrottleSubscriber> subscribersNew = new ArrayList<ThrottleSubscriber>();
-        		subscribersNew.addAll(index, subscribers);
-        		subscribers = subscribersNew;
+        		subscribers = subscribers.subList(index, subscribers.size());
         	}
 
         	return ThrottleResult.PROCEED;
