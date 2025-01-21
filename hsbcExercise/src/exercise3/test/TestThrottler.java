@@ -17,7 +17,7 @@ public class TestThrottler {
 
     // Test of Throttler
     public static void testThrottler() throws InterruptedException {
-        System.out.println("Testing hrottler...");
+        System.out.println("Testing Throttler...");
 
         System.out.println("In this test, we have defined the Throttler to only manage 3 calls simultaneously over 5 secs");
         System.out.println("Warning rules #1: After a successfull PROCEED we voluntary wait 1s");
