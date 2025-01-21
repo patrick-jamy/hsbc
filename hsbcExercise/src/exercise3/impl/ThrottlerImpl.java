@@ -44,7 +44,7 @@ public class ThrottlerImpl implements Throttler {
         	// Notify
         	if (subscribers.size() > 0) {
         		int index = 0;
-        		for (int notifiyCount = callTimes.size() ; notifiyCount < maxCalls; notifiyCount ++)  {
+        		for (int notifiyCount = maxCalls - callTimes.size() ; notifiyCount < maxCalls; notifiyCount ++)  {
         			notifyWhenCanProceed(subscribers.get(index));
         			index++;
         		}
@@ -52,7 +52,7 @@ public class ThrottlerImpl implements Throttler {
 
         		// Refresh the list
         		List<ThrottleSubscriber> subscribersNew = new ArrayList<ThrottleSubscriber>();
-        		subscribersNew.addAll(callTimes.size(), subscribers);
+        		subscribersNew.addAll(index, subscribers);
         		subscribers = subscribersNew;
         	}
 
