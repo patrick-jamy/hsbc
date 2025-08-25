@@ -1,27 +1,7 @@
-private static String retrieveRelevantContract(Participation participation, String fieldName) {
-    String result = null;
+JsonNode root = objectMapper.readTree(cdmContext.getCdmJson());
 
-    if (participation != null 
-            && participation.getContractList() != null 
-            && participation.getContractList().length > 0) {
+String prdrasValue = root
+    .at("/originatingWorkflowStep/businessEvent/instruction/0/before/0/value/trade/tradeIdentifier/0/assignedIdentifier/1/identifier/value")
+    .asText(null);
 
-        List<String> contractList = Arrays.asList(participation.getContractList());
-
-        // Essayer de trouver un "_after"
-        Optional<String> contractOpt = contractList.stream()
-                .filter(c -> c != null && c.contains("_after"))
-                .findFirst();
-
-        // Si rien trouvé → prendre le premier élément de la liste
-        String contract = contractOpt.orElse(contractList.get(0));
-
-        // Appliquer la même transformation que tu avais
-        result = Arrays.stream(contract.split("\\|"))
-                .filter(c -> c.startsWith(fieldName))
-                .map(c -> c.replace(fieldName + "=", ""))
-                .findFirst()
-                .orElse(null);
-    }
-
-    return result;
-}
+System.out.println("PRDRAS = " + prdrasValue);
